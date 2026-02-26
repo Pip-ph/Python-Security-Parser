@@ -1,1 +1,5 @@
-print("Hello, World!")
+import ast
+
+class SecurityScanner(ast.NodeVisitor):
+    pass
+
