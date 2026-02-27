@@ -1,0 +1,12 @@
+List of Vunerabilties that this software checks for
+
+eval() / exec() – Runs a string as Python code. If the string contains user input, an attacker can execute any Python command on your server (Remote Code Execution).
+
+compile() – Converts a string into "code objects" for later execution. Like eval, it allows dynamic code execution that can be hijacked.
+
+os.system() / os.popen() – Passes a string directly to the system shell. If the string includes unescaped user data, an attacker can use ; or && to run unauthorized OS commands.
+
+subprocess.run(..., shell=True) – (And all subprocess variants) Running with shell=True spawns an intermediate shell process. 
+This makes the application vulnerable to shell injection unless the arguments are perfectly sanitized.
+
+shlex.quote() – A utility to escape strings for shells. If your parser sees shell commands without this (or a similar balancer), it indicates a high risk of injection.
