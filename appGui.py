@@ -1,43 +1,66 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog, messagebox
 import ast
 from src.scanner.main import SecurityScanner 
 
-def start_scan():
-    code = code_input.get("1.0", tk.END)
+def start_scan(file_content):
+    """Takes the code string, parses it, and runs the generator."""
     report_area.delete("1.0", tk.END)
-    report_area.insert(tk.END, "Scanning...\n")
+    report_area.insert(tk.END, "--- Analysis Started ---\n")
     
     try:
-        tree = ast.parse(code)
+        tree = ast.parse(file_content)
         scanner = SecurityScanner()
         
-        #Loop over the generator
+        found_any = False
         for finding in scanner.scan(tree):
-            
+            found_any = True
             report_area.insert(tk.END, finding + "\n", "warning")
-            root.update_idletasks() 
+            window.update_idletasks() 
+        
+        if not found_any:
+            report_area.insert(tk.END, "✔ Scan Complete: No issues found.\n")
             
     except Exception as e:
-        report_area.insert(tk.END, f"Error: {e}")
+        report_area.insert(tk.END, f"Parsing Error: {e}\n")
 
-#TKinter
-root = tk.Tk()
-root.title("Security Scanner")
+def get_file():
+    filepath = filedialog.askopenfilename(
+        filetypes=(("Python files", "*.py"), ("All files", "*.*"))
+    )
+    
+    if filepath:
+        try:
+            with open(filepath, "r") as f:
+                content = f.read()
+            #Immediately pass the code to the scanner logic
+            start_scan(content)
+        except Exception as e:
+            messagebox.showerror("File Error", f"Could not read file: {e}")
 
-#Input Area
-tk.Label(root, text="Paste Code Here:").pack()
-code_input = scrolledtext.ScrolledText(root, height=10)
-code_input.pack()
+#Tkinter 
+window = tk.Tk()
+window.title("Python Security Parser")
+window.geometry('800x500') 
 
-#Scan Button
-btn = tk.Button(root, text="Run Security Scan", command=start_scan)
-btn.pack(pady=10)
-
-#Report Area
-tk.Label(root, text="Reports:").pack()
-report_area = scrolledtext.ScrolledText(root, height=10, fg="green", bg="black")
+#Styling the output
+report_area = scrolledtext.ScrolledText(window, height=20, bg="black", fg="white")
 report_area.tag_config("warning", foreground="red")
-report_area.pack()
 
-root.mainloop()
+choose_button = tk.Button(
+    window, 
+    text="Select Python File to Scan", 
+    command=get_file, 
+    activebackground="yellow",
+    font=("Arial", 12, "bold")
+)
+
+#Grid Layout
+for i in range(4):
+    window.columnconfigure(i, weight=1)
+    window.rowconfigure(i, weight=1)
+
+choose_button.grid(row=0, column=0, columnspan=4, sticky="NSEW", padx=10, pady=10)
+report_area.grid(row=1, column=0, columnspan=4, rowspan=3, sticky="NSEW", padx=10, pady=10)
+
+window.mainloop()
