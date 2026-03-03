@@ -36,7 +36,7 @@ class SecurityScanner(ast.NodeVisitor):
                 if isinstance(target, ast.Name):
                     self.tainted_vars.add(target.id)
         
-        #Comment:Checking for untaint/sanitization
+        #Checking for untaint/sanitization
         if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
             if node.value.func.id in ["int", "float"]:
                 for target in node.targets:
@@ -45,7 +45,7 @@ class SecurityScanner(ast.NodeVisitor):
         
 
     def visit_Call(self, node):
-        #Comment:Function to check if any argument is tainted
+        #Function to check if any argument is tainted
         def is_arg_tainted(args):
             for arg in args:
                 if isinstance(arg, ast.Name) and arg.id in self.tainted_vars:
@@ -57,7 +57,7 @@ class SecurityScanner(ast.NodeVisitor):
         
             #Checking for os.system()
             if getattr(node.func.value, "id", None) == "os" and node.func.attr == "system":
-                #Comment:Check if the argument in os.system is tainted
+                #Check if the argument in os.system is tainted
                 tainted, var_name = is_arg_tainted(node.args)
                 if tainted:
                     self.vulnerabilitiesFound +=1
@@ -80,7 +80,7 @@ class SecurityScanner(ast.NodeVisitor):
                     valueUnparsed = ast.unparse(kw.value)
 
                     if keyWord == "shell" and valueUnparsed == "True":
-                        #Comment:Check if the first argument (the command) is tainted
+                        #Check if the first argument (the command) is tainted
                         tainted, var_name = is_arg_tainted(node.args)
                         if tainted:
                             self.vulnerabilitiesFound +=1
@@ -94,7 +94,7 @@ class SecurityScanner(ast.NodeVisitor):
 
             #Checking eval()
             if node.func.id == "eval" or node.func.id =="exec" or node.func.id == "compile":
-                #Comment:Check if the argument is tainted
+                #Check if the argument is tainted
                 tainted, var_name = is_arg_tainted(node.args)
                 if tainted:
                     self.vulnerabilitiesFound +=1
