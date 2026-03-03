@@ -2,7 +2,9 @@ import os
 import subprocess
 
 #1. os.system check
-os.system("rm -rf /")
+tainted = input("Give a command")
+os.system(tainted)
+
 
 #2. subprocess with shell=True check
 subprocess.run("ls -la", shell=True)
