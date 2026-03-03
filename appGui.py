@@ -4,7 +4,6 @@ import ast
 from src.scanner.main import SecurityScanner 
 
 def start_scan(file_content):
-    """Takes the code string, parses it, and runs the generator."""
     report_area.delete("1.0", tk.END)
     report_area.insert(tk.END, "--- Analysis Started ---\n")
     
